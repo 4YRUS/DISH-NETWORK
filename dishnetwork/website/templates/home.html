@@ -1,0 +1,109 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style type="text/css">
+	.camera-container{
+		
+		width: 100%;
+		height: 100%;
+	}
+	#video{
+		position: relative;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		height: 100%;
+	}
+</style>
+
+<div class="camera-container" >
+	 <video id="video" autoplay ></video>
+</div>
+<canvas id="image" style="display: none;"></canvas>
+
+<script type="text/javascript">
+
+	function convert_voice(text) {
+		speech = new SpeechSynthesisUtterance(text);
+		speech.lang = 'en-US'
+		speech.rate = 1
+		speech.pitch = 2
+
+		window.speechSynthesis.speak(speech)
+
+	}
+
+	function getCookie(name) {
+	      let cookieValue = null;
+	      if (document.cookie && document.cookie !== '') {
+	          const cookies = document.cookie.split(';');
+	          for (let i = 0; i < cookies.length; i++) {
+	              const cookie = cookies[i].trim();
+	              // Does this cookie string begin with the name we want?
+	              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                  break;
+	              }
+	          }
+	      }
+	      return cookieValue;
+	  }
+	
+	let video = document.querySelector("#video")
+	navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+    .then(stream => {
+        video.srcObject = stream; // Set the video source to the camera stream
+    })
+    .catch(error => {
+        console.error("Camera access denied:", error);
+    });
+	
+	video.addEventListener("click",()=>{
+		window.speechSynthesis.cancel();
+		console.log("CLICKED")
+		let canvas = document.querySelector("#image")
+		const context = canvas.getContext("2d");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            let imagedata = canvas.toDataURL('image/png')
+
+            let data = {
+            	image : imagedata,
+            }
+
+            speech = new SpeechSynthesisUtterance( " please wait until the image is processed ")
+            speech.lang = 'en-US'
+            speech.rate = '0.5'
+            speech.pitch = 2
+
+            window.speechSynthesis.speak(speech)
+
+            fetch('http://127.0.0.1:8000/',{
+            	method : 'post',
+            	headers : {
+            		'Content-Type':'application/json',
+            		'X-CSRFToken' : getCookie("csrftoken"),
+            	},
+            	body : JSON.stringify(data)	
+            })
+            .then(response=>{
+            	return response.json()
+            })
+            .then(newdata=>{
+            	window.speechSynthesis.cancel()
+            	console.log(convert_voice(newdata.message))
+            })
+            .catch(error =>{
+            	console.log(error)
+            })
+
+        
+	})
+
+</script>
+
+{% endblock %}

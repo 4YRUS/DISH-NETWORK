@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div id='container1' style="height: 100%; width: 100%; background-color: red;" >
+	<button class="btn btn-secondary record" style=" position: relative; top: 80%; left: 50%; transform: translate(-50%, -50%);" >record</button>
+	<button class="btn btn-secondary recording" style="visibility: hidden; position: relative; top: 80%; left: 45%; transform: translate(-50%, -50%);">recording</button>
+</div>
+
+<script type="text/javascript">
+	record = document.querySelector(".record")
+	recording = document.querySelector(".recording")
+
+	record.addEventListener('click',(e)=>{
+		recording.style.visibility='visible'
+		record.style.visibility='hidden'
+	})
+	recording.addEventListener('click',(e)=>{
+		record.style.visibility='visible'
+		recording.style.visibility='hidden'
+	})
+
+
+</script>
+
+{% endblock %}
