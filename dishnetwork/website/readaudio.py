@@ -1,7 +1,7 @@
 import google.generativeai as genai
 import base64
 
-genai.configure(api_key="AIzaSyBR-uUlDxlk4VXEiE0SiPGPsLsvxWFf67M")
+genai.configure(api_key=" ''' YOUR API KEY HERE ''' ")
 
 def encode_audio(audio_path):
     with open(audio_path, "rb") as audio_file:
