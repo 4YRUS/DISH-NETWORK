@@ -3,22 +3,115 @@
 
 {% block content %}
 
-<div id='container1' style="height: 100%; width: 100%; background-color: red;" >
-	<button class="btn btn-secondary record" style=" position: relative; top: 80%; left: 50%; transform: translate(-50%, -50%);" >record</button>
-	<button class="btn btn-secondary recording" style="visibility: hidden; position: relative; top: 80%; left: 45%; transform: translate(-50%, -50%);">recording</button>
+<div id='container1' style="height: 100%; width: 100%;  " >
+	<div id='voice-text' style="position: relative;	min-height: 200px; width: 50%; border: 2px solid gray; border-radius: 10px; top: 25%; left: 50%; transform: translate(-50%,-50%); background-color: white; font-size: 20px; padding: 3px; max-height: 500px; overflow:scroll; scrollbar-width: none;" >Voice converted to text will be displayed here ... </div>
+	
+	<div class=" item-to-hover  record" style=" position: absolute; top: 75%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; text-align: center;" >
+		<svg fill="#ffffff" width="99px" height="99px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M960.315 96.818c-186.858 0-338.862 152.003-338.862 338.861v484.088c0 186.858 152.004 338.862 338.862 338.862 186.858 0 338.861-152.004 338.861-338.862V435.68c0-186.858-152.003-338.861-338.861-338.861M427.818 709.983V943.41c0 293.551 238.946 532.497 532.497 532.497 293.55 0 532.496-238.946 532.496-532.497V709.983h96.818V943.41c0 330.707-256.438 602.668-580.9 627.471l-.006 252.301h242.044V1920H669.862v-96.818h242.043l-.004-252.3C587.438 1546.077 331 1274.116 331 943.41V709.983h96.818ZM960.315 0c240.204 0 435.679 195.475 435.679 435.68v484.087c0 240.205-195.475 435.68-435.68 435.68-240.204 0-435.679-195.475-435.679-435.68V435.68C524.635 195.475 720.11 0 960.315 0Z" fill-rule="evenodd"></path> </g></svg>
+	</svg>
+	<span style="color : white; "><b>RECORD</b></span>
+	</div>
+
+	<div class="recording item-to-hover " style=" position: absolute; top: 75%; left: 50%; transform: translate(-50%, -50%); visibility: hidden; display: flex; flex-direction: column; text-align: center;" >
+	<svg width="99px" height="99px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M3 10L3 14M7.5 6L7.5 18M12 3V21M16.5 6V18M21 10V14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+	<span style="color : white; "><b>RECORDING</b></span>
+	</div>
+
+
+
+	
+
+	
 </div>
 
 <script type="text/javascript">
 	record = document.querySelector(".record")
-	recording = document.querySelector(".recording")
+	stop = document.querySelector(".recording")
+	textbox = document.querySelector("#voice-text")
 
-	record.addEventListener('click',(e)=>{
-		recording.style.visibility='visible'
+
+
+	let chunks = []; 
+
+	function getCookie(name) {
+      let cookieValue = null;
+	      if (document.cookie && document.cookie !== '') {
+	          const cookies = document.cookie.split(';');
+	          for (let i = 0; i < cookies.length; i++) {
+	              const cookie = cookies[i].trim();
+	              // Does this cookie string begin with the name we want?
+	              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+	                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+	                  break;
+	              }
+	          }
+	      }
+	      return cookieValue;
+	  }
+
+	record.addEventListener('click', async (e)=>{
+
+		stop.style.visibility='visible'
 		record.style.visibility='hidden'
+
+		chunks = [];
+
+		stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+
+		mediarecorder = new MediaRecorder(stream)
+
+		mediarecorder.ondataavailable = (e)=>{
+			if(e.data.size>0){
+				chunks.push(e.data)
+			}
+		}
+
+		mediarecorder.onstop = async ()=>{
+			audioblob = new Blob(chunks,{type: 'audio/webm'})
+			console.log(audioblob)
+			const formdata = new FormData()
+
+			formdata.append("audio",audioblob,"recording.webm")
+			console.log(formdata)
+
+			textbox.innerText = "Please wait the audio is being analized..."
+
+			fetch('http://127.0.0.1:8000/deaf/',{
+				method : 'post',
+				headers: {
+					'X-CSRFToken':getCookie("csrftoken"),
+				},
+				body : formdata,
+			}).then(response=>{
+				return response.json()
+			})
+			.then(data=>{
+				console.log(data)
+				data = data.message.split("&@&")
+
+				textbox.innerHTML=`
+				<h5><b>Text : </b></h5>
+				<span>${data[0]+'\n'}</span>
+				<br>
+				<h5 style="margin-top:10px;"><b>Summary : </b></h5>
+				<span>${data[1]}</span>`
+				
+			})
+
+		}
+
+		mediarecorder.start()
 	})
-	recording.addEventListener('click',(e)=>{
+
+
+
+	stop.addEventListener('click',(e)=>{
+
+		mediarecorder.stop()
 		record.style.visibility='visible'
-		recording.style.visibility='hidden'
+		stop.style.visibility='hidden'
+
+
 	})
 
 

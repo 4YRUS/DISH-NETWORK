@@ -7,6 +7,9 @@ from django.core.files.base import ContentFile
 import base64
 
 from .readimage import read_image_for_blind
+from .readaudio import read_audio_for_deaf
+
+from .models import audiofield
 
 
 def home(request):
@@ -22,14 +25,17 @@ def home(request):
 
 			
 			print(obj1.image.url)
-			
-			message = (read_image_for_blind("C:\\Users\\bss22\\OneDrive\\Desktop\\Don't Open\\DJANGO\\DISH\\dishnetwork\\" + obj1.image.url))
+			try:
+				message = (read_image_for_blind("C:\\Users\\bss22\\OneDrive\\Desktop\\Don't Open\\DJANGO\\DISH\\dishnetwork\\" + obj1.image.url))
 
-			print('\n',message)
+				print('\n',message)
 
-			obj1.delete()
+				obj1.delete()
 
-			return JsonResponse({"message": message})
+				return JsonResponse({"message": message})
+			except:
+				obj1.delete()
+				return JsonResponse({"message":"Sorry, There was an error. "})
 		except:
 			return JsonResponse({"Error" : "Not Valid Form"})
 		
@@ -39,6 +45,26 @@ def mute(request):
 	return render(request,'mute.html',{})
 
 def deaf(request):
+	if request.method=='POST':
+
+		audio = request.FILES.get('audio',[])
+
+		obj1 = audiofield.objects.create(audio=audio)
+
+		print(obj1.audio.url)
+		
+		try:
+			message = read_audio_for_deaf("C:\\Users\\bss22\\OneDrive\\Desktop\\Don't Open\\DJANGO\\DISH\\dishnetwork\\" + obj1.audio.url)
+
+			print(message)
+			obj1.delete()
+
+			return JsonResponse({"message":message})
+
+		except:
+			obj1.delete()
+
+			return JsonResponse({"message":"Error &@& Error"})
 	return render(request,'deaf.html',{})
 
 

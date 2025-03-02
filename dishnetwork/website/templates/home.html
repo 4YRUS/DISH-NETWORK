@@ -16,19 +16,28 @@
 		transform: translate(-50%,-50%);
 		height: 100%;
 	}
+	.overallcontainer{
+		height: 100%;
+		width: 100%;
+	}
 </style>
 
-<div class="camera-container" >
-	 <video id="video" autoplay ></video>
+<div class = 'overallcontainer'>
+		<div class="camera-container" >
+		 <video id="video" autoplay ></video>
+	</div>
+	<canvas id="image" style="display: none;"></canvas>
 </div>
-<canvas id="image" style="display: none;"></canvas>
 
 <script type="text/javascript">
+	
+	window.speechSynthesis.cancel()
+
 
 	function convert_voice(text) {
 		speech = new SpeechSynthesisUtterance(text);
 		speech.lang = 'en-US'
-		speech.rate = 1
+		speech.rate = 0.6
 		speech.pitch = 2
 
 		window.speechSynthesis.speak(speech)
@@ -52,6 +61,9 @@
 	  }
 	
 	let video = document.querySelector("#video")
+	let box = document.querySelector(".overallcontainer")
+	// facingMode: 'user' -> front camera
+	// facingMode: 'environment' -> back camera
 	navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
     .then(stream => {
         video.srcObject = stream; // Set the video source to the camera stream
@@ -60,7 +72,7 @@
         console.error("Camera access denied:", error);
     });
 	
-	video.addEventListener("click",()=>{
+	box.addEventListener("click",()=>{
 		window.speechSynthesis.cancel();
 		console.log("CLICKED")
 		let canvas = document.querySelector("#image")
@@ -77,7 +89,7 @@
 
             speech = new SpeechSynthesisUtterance( " please wait until the image is processed ")
             speech.lang = 'en-US'
-            speech.rate = '0.5'
+            speech.rate = 0.6
             speech.pitch = 2
 
             window.speechSynthesis.speak(speech)
@@ -85,7 +97,6 @@
             fetch('http://127.0.0.1:8000/',{
             	method : 'post',
             	headers : {
-            		'Content-Type':'application/json',
             		'X-CSRFToken' : getCookie("csrftoken"),
             	},
             	body : JSON.stringify(data)	
@@ -94,8 +105,10 @@
             	return response.json()
             })
             .then(newdata=>{
+            	console.log(newdata.message)
             	window.speechSynthesis.cancel()
-            	console.log(convert_voice(newdata.message))
+            	convert_voice(newdata.message)
+
             })
             .catch(error =>{
             	console.log(error)

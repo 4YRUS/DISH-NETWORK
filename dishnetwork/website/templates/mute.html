@@ -5,15 +5,26 @@
 
 <div class="get-input-text" style=" width : 100%; height: 100%; position: relative; top: 50%; left: 50%; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; justify-content: space-around;">
 	<textarea id = 'box1' type="text" name="get-text" style="border: 2px solid gray; border-radius: 10px; min-height: 25% ; width: 50%; font-size: 20px; scrollbar-width: none; outline: none;" placeholder="Enter your text here to convert it into voice ...."  ></textarea>
-	<div class="all-buttons">
-		<button id='clear' class="btn btn-secondary">CLEAR</button>
-		<button id='speak' class="btn btn-secondary">SPEAK</button>
-		<button id='stop' class="btn btn-secondary">STOP</button>
+	<div class="all-buttons " style="display: flex; align-items: center; justify-content: space-around; width: 50%;" >
+
+		<div class="item-to-hover" id='clear' style="display: flex; flex-direction: column; text-align: center;"><svg  fill="#ffffff" width="100px" height="100px" viewBox="0 0 1024 1024" t="1569683368540" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9723" xmlns:xlink="http://www.w3.org/1999/xlink" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><defs><style type="text/css"></style></defs><path d="M899.1 869.6l-53-305.6H864c14.4 0 26-11.6 26-26V346c0-14.4-11.6-26-26-26H618V138c0-14.4-11.6-26-26-26H432c-14.4 0-26 11.6-26 26v182H160c-14.4 0-26 11.6-26 26v192c0 14.4 11.6 26 26 26h17.9l-53 305.6c-0.3 1.5-0.4 3-0.4 4.4 0 14.4 11.6 26 26 26h723c1.5 0 3-0.1 4.4-0.4 14.2-2.4 23.7-15.9 21.2-30zM204 390h272V182h72v208h272v104H204V390z m468 440V674c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v156H416V674c0-4.4-3.6-8-8-8h-48c-4.4 0-8 3.6-8 8v156H202.8l45.1-260H776l45.1 260H672z" p-id="9724"></path></g></svg>
+		<span style="color : white; "><b>CLEAR</b></span></div>
+
+		<div class="item-to-hover"  id='speak' style="display: flex; flex-direction: column; text-align: center;" >
+			<svg width="99px" height="99px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16 9C16.5 9.5 17 10.5 17 12C17 13.5 16.5 14.5 16 15M19 6C20.5 7.5 21 10 21 12C21 14 20.5 16.5 19 18M13 3L7 8H5C3.89543 8 3 8.89543 3 10V14C3 15.1046 3.89543 16 5 16H7L13 21V3Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+		<span style="color : white; "><b>SPEAK</b></span></div>
+
+		<div class="item-to-hover"  id='stop' style="display: flex; flex-direction: column; text-align: center;" >
+			<svg width="99px" height="99px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16 9L22 15M22 9L16 15M13 3L7 8H5C3.89543 8 3 8.89543 3 10V14C3 15.1046 3.89543 16 5 16H7L13 21V3Z" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+		<span style="color : white; "><b>STOP</b></span></div>
+
 	</div>
 </div>
 
 
 <script>
+
+	window.speechSynthesis.cancel()
 
 	field = document.querySelector("#box1")
 	clear = document.querySelector("#clear")
@@ -30,7 +41,7 @@
 		text = field.value
 		speech = new SpeechSynthesisUtterance(text)
 		speech.lang = 'en-US'
-		speech.rate = 0.7
+		speech.rate = 0.6
 		speech.pitch = 1596351568
 		window.speechSynthesis.speak(speech)
 	})

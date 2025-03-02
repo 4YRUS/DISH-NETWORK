@@ -3,7 +3,7 @@
 import os
 import google.generativeai as genai
 
-genai.configure(api_key="AIzaSyAQe4aGtyKMUq1RHiMXZx3BBJt7YRDDHac")
+genai.configure(api_key="AIzaSyBR-uUlDxlk4VXEiE0SiPGPsLsvxWFf67M")
 
 
 def prep_image(image_path):
@@ -21,5 +21,8 @@ def read_image_for_blind(path):
     sample_file=prep_image(path)
     text = extract_text_from_image(sample_file, "Explain whats in the image to a blind person in a brief.")
     return text
+
+
+
 
 
