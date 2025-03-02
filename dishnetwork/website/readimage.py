@@ -3,7 +3,7 @@
 import os
 import google.generativeai as genai
 
-genai.configure(api_key="AIzaSyBR-uUlDxlk4VXEiE0SiPGPsLsvxWFf67M")
+genai.configure(api_key=" ''' YOUR API KEY HERE ''' ")
 
 
 def prep_image(image_path):
